@@ -1,0 +1,14 @@
+template_path: batch/compute-environment.yaml
+parameters:
+  Project: {{ project_code }}
+  Environment: {{ stack_group_config.Environment }}
+  BatchInstanceProfile: !stack_output stg/batch/iam.yaml::BatchInstanceProfile
+  BatchServiceRole: !stack_output stg/batch/iam.yaml::BatchServiceRole
+  Ec2KeyPair: {{ stack_group_config.access_key_pair }}
+  ComputeEnvSubnets: {{ stack_group_config.project_compute_subnets }}
+  VpcID: {{ stack_group_config.project_vpc }}
+  MinvCpus: "{{ stack_group_config.min_vcpus }}"
+  MaxvCpus: "{{ stack_group_config.max_vcpus }}"
+stack_tags:
+  Project: {{ project_code }}
+  Environment: {{ Environment }}

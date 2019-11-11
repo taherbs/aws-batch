@@ -1,0 +1,13 @@
+template_path: aws/codebuild.yaml
+parameters:
+  Name: {{ project_code }}
+  Stage: TagApp
+  CodeBuildComputeType: {{ stack_group_config.codebuild_compute_type }}
+  CodeBuildImage: {{ stack_group_config.codebuild_image }}
+  CodeBuildType: {{ stack_group_config.codebuild_type }}
+  S3BucketOutputArtifact: !stack_output aws/s3.yaml::S3BucketName
+  ECRRepository: !stack_output aws/ecr.yaml::ecrrepo
+  SNSTopic: !stack_output aws/sns.yaml::SNSTopic
+  BuildSpecPath: infrastructure/codebuild/tagproduction.yaml
+stack_tags:
+  project: {{ project_code }}

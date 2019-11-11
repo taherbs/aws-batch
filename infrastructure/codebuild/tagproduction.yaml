@@ -1,0 +1,23 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      docker: 18
+  build:
+    commands:
+    - 'echo "Tagging started on `date`"'
+
+    - 'echo "# Get/Create parameters"'
+    - 'TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"'
+
+    - 'echo "# Logging to ECR repository on `date`"'
+    - '$(aws ecr get-login --no-include-email)'
+
+    - 'echo "# Add tags on docker image running in production ${REPOSITORY_URI}:${TAG} on `date`"'
+    - 'docker pull "${REPOSITORY_URI}:${TAG}"'
+    - 'docker tag "${REPOSITORY_URI}:${TAG}" "${REPOSITORY_URI}:production-${TAG}"'
+    - 'docker tag "${REPOSITORY_URI}:${TAG}" "${REPOSITORY_URI}:production"'
+    - 'docker push "${REPOSITORY_URI}"'
+cache:
+  paths:
+  - '/root/.docker-cache/*'

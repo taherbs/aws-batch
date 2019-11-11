@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CI/CD SNS Topic
+Parameters:
+  Project:
+    Description: Project name.
+    Type: String
+  NotificationEmailAddress:
+    Description: Topic SNS for notification.
+    Type: String
+Resources:
+  SNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Ref Project
+      Subscription:
+      - Endpoint: !Ref NotificationEmailAddress
+        Protocol: email
+  SNSTopicPolicy:
+    Type: "AWS::SNS::TopicPolicy"
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: SourceCodePipelineToTopic
+            Effect: 'Allow'
+            Principal:
+              Service:
+              - events.amazonaws.com
+            Action:
+              - 'sns:Publish'
+            Resource: !Ref SNSTopic
+      Topics:
+        - !Ref SNSTopic
+Outputs:
+  SNSTopic:
+    Description: SNS topic name.
+    Value: !Ref SNSTopic

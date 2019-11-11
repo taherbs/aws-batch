@@ -1,0 +1,7 @@
+template_path: batch/iam.yaml
+parameters:
+  Name: {{ project_code }}
+  Environment: {{ stack_group_config.Environment }}
+stack_tags:
+  Project: {{ project_code }}
+  Environment: {{ stack_group_config.Environment }}

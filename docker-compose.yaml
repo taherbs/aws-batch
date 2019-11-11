@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  ### Web Container ###
+  app:
+    build:
+      context: ./
+      dockerfile: ./docker_artifacts/Dockerfile
+    volumes:
+      - ./code:/app

@@ -1,0 +1,14 @@
+template_path: aws/codepipeline.yaml
+parameters:
+  Name: {{ project_code }}
+  BuildApp: !stack_output aws/buildapp.yaml::BuildProject
+  TagProductionApp: !stack_output aws/tagapp.yaml::BuildProject
+  ArtifactBucket: !stack_output aws/s3.yaml::S3BucketName
+  GitToken: !get_parameter {{ stack_group_config.git_token_parm_store }}
+  GitWebhookSecret: !get_parameter {{ stack_group_config.git_webhook_secret_parm_store }}
+  GitRepositoryApplication: {{ stack_group_config.git_repository }}
+  GitRepositoryOwner: {{ stack_group_config.git_repository_owner }}
+  GitBranchApplication: {{ stack_group_config.git_branch }}
+  SNSTopic: !stack_output aws/sns.yaml::SNSTopic
+stack_tags:
+  project: {{ project_code }}

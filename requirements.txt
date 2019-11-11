@@ -1,0 +1,4 @@
+sceptre==2.*
+awscli
+pprint
+boto3

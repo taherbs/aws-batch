@@ -1,0 +1,95 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS IAM Roles
+Parameters:
+  Name:
+    Description: Project name.
+    Type: String
+  Environment:
+    Description: Environment name.
+    Type: String
+Resources:
+  # Privileges granted to the batch task
+  BatchJobRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join ["-", [ !Ref Name, !Ref Environment, BatchJobRole] ]
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "ecs-tasks.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+        - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+
+  BatchInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+        - "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+        - "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleForSSM"
+  BatchInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref 'BatchInstanceRole'
+      InstanceProfileName: !Ref 'BatchInstanceRole'
+  BatchServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "batch.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole"
+  AmazonEC2SpotFleetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "spotfleet.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole"
+
+Outputs:
+  BatchServiceRole:
+    Description: Batch service role.
+    Value: !GetAtt 'BatchServiceRole.Arn'
+  AmazonEC2SpotFleetRole:
+    Description: Batch service role.
+    Value: !GetAtt 'AmazonEC2SpotFleetRole.Arn'
+  BatchInstanceRole:
+    Description: ECS instance role.
+    Value: !GetAtt 'BatchInstanceRole.Arn'
+  BatchInstanceProfile:
+    Description: ECS instance profile.
+    Value: !GetAtt 'BatchInstanceProfile.Arn'
+  BatchJobRole:
+    Description: ECS task role.
+    Value: !GetAtt 'BatchJobRole.Arn'

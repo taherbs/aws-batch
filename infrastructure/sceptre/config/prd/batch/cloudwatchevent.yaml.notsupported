@@ -1,0 +1,9 @@
+template_path: batch/cloudwatchevent.yaml
+parameters:
+  Name: {{ project_code }}
+  Environment: {{ stack_group_config.Environment }}
+  BatchJobQueueARN: {{ stack_group_config.Environment }}
+  BatchJobDefinitionARN: !stack_output prd/batch/iam.yaml::BatchInstanceProfile
+stack_tags:
+  Project: {{ project_code }}
+  Environment: {{ Environment }}

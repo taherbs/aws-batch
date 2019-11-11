@@ -1,0 +1,9 @@
+template_path: aws/ecr.yaml
+parameters:
+    Name: {{ project_code }}
+    Image: app
+hooks:
+  before_delete:
+      - !clean_ecr_repo {{ project_code }}-app
+stack_tags:
+    project: {{ project_code }}

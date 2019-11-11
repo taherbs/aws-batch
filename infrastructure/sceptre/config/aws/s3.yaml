@@ -1,0 +1,5 @@
+template_path: aws/s3.yaml
+parameters:
+  BucketName: {{ stack_group_config.s3_artifacts_output_bucket }}
+stack_tags:
+  project: {{ project_code }}

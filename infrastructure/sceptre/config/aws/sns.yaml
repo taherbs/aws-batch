@@ -1,0 +1,6 @@
+template_path: aws/sns.yaml
+parameters:
+  Project: {{ project_code }}
+  NotificationEmailAddress: {{ stack_group_config.notification_email_address }}
+stack_tags:
+  project: {{ project_code }}

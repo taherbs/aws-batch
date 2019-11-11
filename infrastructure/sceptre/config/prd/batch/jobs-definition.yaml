@@ -1,0 +1,10 @@
+template_path: batch/jobs-definition.yaml
+parameters:
+  Project: {{ project_code }}
+  Environment: {{ stack_group_config.Environment }}
+  BatchJobRole: !stack_output prd/batch/iam.yaml::BatchJobRole
+  ECRRepository: !stack_output aws/ecr.yaml::ecrrepo
+  Tag: {{ stack_group_config.Environment }}
+stack_tags:
+  Project: {{ project_code }}
+  Environment: {{ stack_group_config.Environment }}

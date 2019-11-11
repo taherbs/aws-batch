@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: AWS Batch Job definition
+Parameters:
+  Project:
+    Description: Project name.
+    Type: String
+  Environment:
+    Description: Environment name.
+    Type: String
+  BatchJobRole:
+    Description: The Amazon Resource Name (ARN) of the IAM role that the container can assume for AWS permissions.
+    Type: String
+  ECRRepository:
+    Description: app ECR repo name.
+    Type: String
+  Tag:
+    Description: App ECR tag.
+    Type: String
+Resources:
+  JobDefinition:
+    Type: AWS::Batch::JobDefinition
+    Properties:
+      JobDefinitionName: !Sub '${Project}-${Environment}'
+      Type: container
+      RetryStrategy:
+        Attempts: 1
+      ContainerProperties:
+        Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepository}:${Tag}
+        Vcpus: 1
+        Memory: 2000
+        JobRoleArn: !Ref 'BatchJobRole'
+        Environment:
+          - Name: ENV_DEPLOYMENT
+            Value: !Ref 'Environment'
+Outputs:
+  JobDefinition:
+    Description: Job definition Arn.
+    Value: !Ref 'JobDefinition'

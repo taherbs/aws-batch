@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  Name:
+    Description: The service name
+    Type: String
+  Environment:
+    Description: Environment name.
+    Type: String
+  BatchJobQueueARN:
+    Type: String
+  BatchJobDefinitionARN:
+    Type: String
+Resources:
+  ScheduledBatch:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Join ["-", [ !Ref Name, !Ref Environment, 'event', 'run', 'batch' ] ]
+      Description: "Run batch job every day"
+      ScheduleExpression: "cron(0/1 * ? * MON-FRI *)"
+      State: "ENABLED"
+      Targets:
+        - Arn: !Ref BatchJobQueueARN
+          Id: "Single_Batch_Target"
+          BatchParameters:
+              JobDefinition: !Ref BatchJobDefinitionARN
+              JobName: !Join ["-", [ !Ref Name, !Ref Environment, 'batch', 'run' ] ]
+              RetryStrategy:
+                  Attempts: 1
+          RoleArn: !GetAtt IvokeRole.Arn
+  IvokeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join ["-", [ !Ref Name, !Ref Environment, 'event' ] ]
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - events.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/service-role/"
+      Policies:
+      - PolicyName: !Ref Name
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: "batch:SubmitJob"
+            Resource: "*"

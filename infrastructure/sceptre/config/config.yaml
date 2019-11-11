@@ -1,0 +1,24 @@
+# Sceptre Global variables
+project_code: batch #Project Name
+region: eu-west-1 #Region to deploy to
+
+# CodeBuild/CodePipeline (CI/CD) variables
+codebuild_compute_type: BUILD_GENERAL1_SMALL #CodeBuild compute type
+codebuild_image: aws/codebuild/standard:2.0 #CodeBuild image name
+codebuild_type: LINUX_CONTAINER #CodeBuild type of container
+s3_artifacts_output_bucket: aws-batch-output-artifacts #s3 bucket to store artifacts created by the Codebuild and the pipeline
+git_repository_owner: taherbs #Github repo Org or Owner
+git_repository: aws-batch #Github repo name
+git_branch: master #Github repo branch
+git_token_parm_store: gittoken #Path to Github personal token in parameters store
+git_webhook_secret_parm_store: gitwebhooksecret #Path to Github webhook secret in parameters store
+notification_email_address: XXXgmail.com #Email address to witch to send notifications
+
+# VPC/subnets config
+project_vpc: vpc-XXX #VPC id
+project_compute_subnets: subnet-XXXX #List of subnets
+
+# batch EC2 instances config/spec
+access_key_pair: key-XXX #EC2 access key
+min_vcpus: '0' #Minimum and current number of vCPU's
+min_vcpus: '64' #Maximum number of vCPU's

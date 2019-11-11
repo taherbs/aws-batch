@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: AWS Batch compute environment
+Parameters:
+  Project:
+    Description: Project name.
+    Type: String
+  Environment:
+    Description: Environment name.
+    Type: String
+  BatchInstanceProfile:
+    Description: IAM instance role.
+    Type: String
+  BatchServiceRole:
+    Description: IAM Batch role.
+    Type: String
+  Ec2KeyPair:
+    Description: The EC2 key pair that is used for instances launched in the compute environment.
+    Type: String
+  ComputeEnvSubnets:
+    Description: The VPC subnets into which the compute resources are launched.
+    Type: List<String>
+  VpcID:
+    Description: Vcp id.
+    Type: String
+  MinvCpus:
+    Description: Minimum number of vCPUs that will get provisioned.
+    Type: String
+  MaxvCpus:
+    Description: Maximum number of vCPUs that can get provisioned.
+    Type: String
+Resources:
+  ComputeEnvironmentOnDemand:
+    Type: AWS::Batch::ComputeEnvironment
+    Properties:
+      ComputeEnvironmentName: !Sub '${Project}-${Environment}-OnDemand'
+      ServiceRole: !Ref 'BatchServiceRole'
+      Type: MANAGED
+      State: ENABLED
+      ComputeResources:
+        SecurityGroupIds:
+          - !Ref 'SecurityGroup'
+        InstanceRole: !Ref 'BatchInstanceProfile'
+        InstanceTypes:
+          - "optimal"
+        MinvCpus: !Ref MinvCpus
+        DesiredvCpus: !Ref 'MinvCpus'
+        MaxvCpus: !Ref 'MaxvCpus'
+        Subnets: !Ref 'ComputeEnvSubnets'
+        Ec2KeyPair: !Ref 'Ec2KeyPair'
+        Tags:
+          Name: !Sub '${Project}-${Environment}'
+        Type: Ec2
+  JobQueue:
+    Type: AWS::Batch::JobQueue
+    Properties:
+      ComputeEnvironmentOrder:
+        - ComputeEnvironment: !Ref 'ComputeEnvironmentOnDemand'
+          Order: 1
+      JobQueueName: !Sub '${Project}-high-priority-${Environment}'
+      Priority: 1
+      State: "ENABLED"
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable full access
+      VpcId: !Ref 'VpcID'
+      SecurityGroupIngress:
+        - CidrIp: '0.0.0.0/0'
+          IpProtocol: '-1'
+Outputs:
+  ComputeEnvironmentOnDemand:
+    Description: Compute environment ARN.
+    Value: !Ref 'ComputeEnvironmentOnDemand'
+  JobQueue:
+    Description: Job queue ARN.
+    Value: !Ref 'JobQueue'
